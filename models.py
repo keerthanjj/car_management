@@ -92,13 +92,13 @@ class Car:
     
     @staticmethod
     def get_by_id(car_id):
-        query = "SELECT make, model FROM car_management.public.car WHERE car_id = %s"
+        query = "SELECT make, model,price FROM car_management.public.car WHERE car_id = %s"
         try:
             result = Car.execute_query(query, (car_id,), fetchall=False)
             if result:
-                make, model = result
+                make, model,price = result
                 current_app.logger.info(f"Car details found: make={make}, model={model}")
-                return {'make': make, 'model': model}
+                return {'make': make, 'model': model,'price':price}
             else:
                 current_app.logger.error(f"No car details found for car_id: {car_id}")
                 return None
@@ -112,30 +112,30 @@ class Car:
 class Booking:
 
     @staticmethod
-    def create_booking(user_name, phone_number, car_id, car_make, car_model, booking_date, address):
+    def create_booking(user_name, phone_number, car_id, car_make, car_model, price, booking_date, address):
         # Validate input parameters
-        if not (user_name and phone_number and car_id and car_make and car_model and booking_date and address):
+        if not (user_name and phone_number and car_id and car_make and car_model and price and booking_date and address):
             current_app.logger.error("Missing booking details")
             return None
-        
+
         insert_query = """
             INSERT INTO car_management.public.bookings 
-            (user_name, phone_number, car_id, car_make, car_model, booking_date, address)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            (user_name, phone_number, car_id, car_make, car_model, price, booking_date, address)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
-        data = (user_name, phone_number, car_id, car_make, car_model, booking_date, address)
+        data = (user_name, phone_number, car_id, car_make, car_model, price, booking_date, address)
 
         try:
             # Execute the insert query
             current_app.logger.info(f"Executing insert query with data: {data}")
             Car.execute_query(insert_query, data, fetchall=False)
-            
+
             # Retrieve the booking_id based on the inserted data
             select_query = """
                 SELECT booking_id
                 FROM car_management.public.bookings
                 WHERE user_name = %s AND phone_number = %s AND car_id = %s AND car_make = %s 
-                  AND car_model = %s AND booking_date = %s AND address = %s
+                AND car_model = %s AND price = %s AND booking_date = %s AND address = %s
                 ORDER BY booking_id DESC
                 LIMIT 1
             """
@@ -145,6 +145,16 @@ class Booking:
             if result and len(result) > 0:
                 booking_id = result[0]
                 current_app.logger.info(f"Booking created successfully with ID: {booking_id}")
+
+                # Update car status to booked
+                update_query = """
+                    UPDATE car_management.public.car
+                    SET status = 'Booked'
+                    WHERE car_id = %s
+                """
+                Car.execute_query(update_query, (car_id,), fetchall=False)
+                current_app.logger.info(f"Car status updated to 'Booked' for car_id: {car_id}")
+
                 return booking_id
             else:
                 current_app.logger.error("No result returned from the select query")
@@ -152,6 +162,7 @@ class Booking:
         except Exception as e:
             current_app.logger.error(f"Database query failed: {e}")
             return None
+
 
 
 

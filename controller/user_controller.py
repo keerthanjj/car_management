@@ -53,6 +53,7 @@ def create_booking():
         if car:
             car_make = car.get('make')
             car_model = car.get('model')
+            car_price=car.get('price')
         else:
             return jsonify({"error": "Car details not found"}), 404
 
@@ -60,7 +61,7 @@ def create_booking():
         booking_date = datetime.now()
 
         # Call create_booking method from Booking model
-        booking_id = Booking.create_booking(user_name, phone_number, car_id, car_make, car_model, booking_date, address)
+        booking_id = Booking.create_booking(user_name, phone_number, car_id, car_make, car_model,car_price, booking_date, address)
         
         if booking_id:
             return jsonify({"message": "Booking created successfully", "booking_id": booking_id}), 201
