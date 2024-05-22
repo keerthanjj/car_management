@@ -57,7 +57,7 @@ class Car:
 
     @staticmethod
     def get_current_bookings():
-        query = "SELECT * FROM booking"
+        query = "SELECT * FROM bookings"
         return Car.execute_query(query, fetchall=True)
     
     @staticmethod
@@ -110,6 +110,7 @@ class Car:
         
 
 class Booking:
+
     @staticmethod
     def create_booking(user_name, phone_number, car_id, car_make, car_model, booking_date, address):
         # Validate input parameters
@@ -117,24 +118,36 @@ class Booking:
             current_app.logger.error("Missing booking details")
             return None
         
-        query = """
+        insert_query = """
             INSERT INTO car_management.public.bookings 
             (user_name, phone_number, car_id, car_make, car_model, booking_date, address)
-            VALUES (%s, %s, %s, %s, %s, %s, %s) 
-            RETURNING booking_id
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
         data = (user_name, phone_number, car_id, car_make, car_model, booking_date, address)
 
         try:
+            # Execute the insert query
             current_app.logger.info(f"Executing insert query with data: {data}")
-            result = Car.execute_query(query, data, fetchall=False)
+            Car.execute_query(insert_query, data, fetchall=False)
+            
+            # Retrieve the booking_id based on the inserted data
+            select_query = """
+                SELECT booking_id
+                FROM car_management.public.bookings
+                WHERE user_name = %s AND phone_number = %s AND car_id = %s AND car_make = %s 
+                  AND car_model = %s AND booking_date = %s AND address = %s
+                ORDER BY booking_id DESC
+                LIMIT 1
+            """
+            result = Car.execute_query(select_query, data, fetchall=False)
             current_app.logger.info(f"Query executed, result: {result}")
+
             if result and len(result) > 0:
                 booking_id = result[0]
                 current_app.logger.info(f"Booking created successfully with ID: {booking_id}")
                 return booking_id
             else:
-                current_app.logger.error("No result returned from the insert query")
+                current_app.logger.error("No result returned from the select query")
                 return None
         except Exception as e:
             current_app.logger.error(f"Database query failed: {e}")
