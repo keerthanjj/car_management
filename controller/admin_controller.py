@@ -4,17 +4,23 @@ from models import Car
 admin_bp = Blueprint('admin', __name__)
 
 
+from flask import request, jsonify, render_template
+
+# Import Car model and other necessary modules
+
 @admin_bp.route('/add_car', methods=['POST'])
 def add_car():
-    car_data = request.json
-    make = car_data.get("make")
-    model = car_data.get("model")
-    car_data_list = list(car_data.values())
-    
-    Car.add_car(car_data_list) 
-    
-    message = f"{make} {model} added successfully"
-    return jsonify({"message": message}), 201
+        car_data = request.json
+        make = car_data.get("make")
+        model = car_data.get("model")
+        car_data_list = list(car_data.values())
+
+        # Call the add_car method from the Car model
+        Car.add_car(car_data_list)
+
+        message = f"{make} {model} added successfully"
+        return jsonify({"message": message}), 201
+       
 
 
 @admin_bp.route('/update_car/<int:car_id>', methods=['PUT'])

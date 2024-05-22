@@ -62,7 +62,7 @@ class Car:
     
     @staticmethod
     def get_cars_by_criteria(make=None, model=None, min_price=None, max_price=None, type_of_car=None, type_of_fuel=None):
-        query = "SELECT * FROM car_management.public.car WHERE 1=1"
+        query = "SELECT * FROM car_management.public.car WHERE STATUS = 'Available'"
         data = []
 
         if make:
