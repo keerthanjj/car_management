@@ -112,6 +112,11 @@ class Car:
 class Booking:
     @staticmethod
     def create_booking(user_name, phone_number, car_id, car_make, car_model, booking_date, address):
+        # Validate input parameters
+        if not (user_name and phone_number and car_id and car_make and car_model and booking_date and address):
+            current_app.logger.error("Missing booking details")
+            return None
+        
         query = """
             INSERT INTO car_management.public.bookings 
             (user_name, phone_number, car_id, car_make, car_model, booking_date, address)
@@ -119,11 +124,12 @@ class Booking:
             RETURNING booking_id
         """
         data = (user_name, phone_number, car_id, car_make, car_model, booking_date, address)
-        
+
         try:
             current_app.logger.info(f"Executing insert query with data: {data}")
             result = Car.execute_query(query, data, fetchall=False)
-            if result:
+            current_app.logger.info(f"Query executed, result: {result}")
+            if result and len(result) > 0:
                 booking_id = result[0]
                 current_app.logger.info(f"Booking created successfully with ID: {booking_id}")
                 return booking_id
