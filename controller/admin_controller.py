@@ -26,8 +26,18 @@ def add_car():
 @admin_bp.route('/update_car/<int:car_id>', methods=['PUT'])
 def update_car(car_id):
     car_data = request.json
-    Car.update_car(car_id, car_data)
+    # Convert dictionary to list
+    car_data_list = [
+        car_data['make'],
+        car_data['model'],
+        car_data['price'],
+        car_data['year'],
+        car_data['type_of_car'],
+        car_data['type_of_fuel']
+    ]
+    Car.update_car(car_id, car_data_list)
     return jsonify({"message": "Car updated successfully"}), 200
+
 
 @admin_bp.route('/delete_car/<int:car_id>', methods=['DELETE'])
 def delete_car(car_id):

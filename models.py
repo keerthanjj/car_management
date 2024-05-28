@@ -41,9 +41,11 @@ class Car:
     def update_car(car_id, car_data):
         query = ("UPDATE car SET make = %s, model = %s, price = %s, "
                  "year = %s, type_of_car = %s, type_of_fuel = %s "
-                 "WHERE id = %s")
+                 "WHERE car_id = %s")
+        # Pass car_id as a separate parameter
         car_data.append(car_id)
         Car.execute_query(query, car_data)
+        
 
     @staticmethod
     def delete_car(car_id):
