@@ -19,9 +19,17 @@ def add_car():
         Car.add_car(car_data_list)
 
         message = f"{make} {model} added successfully"
-        return jsonify({"message": message}), 201
+        return jsonify({"message": message}), 200
        
 
+@admin_bp.route('/get_car', methods=['GET'])
+def get_car():
+    car_id = request.args.get('car_id')
+    car = Car.get_by_id(car_id)
+    if car:
+        return jsonify(car), 200
+    else:
+        return jsonify({"message": "Car not found"}), 404
 
 @admin_bp.route('/update_car/<int:car_id>', methods=['PUT'])
 def update_car(car_id):

@@ -2,6 +2,7 @@ import datetime
 from flask import current_app
 import snowflake.connector
 from config import SNOWFLAKE
+from datetime import datetime 
 
 class Car:
     @staticmethod
@@ -64,33 +65,33 @@ class Car:
     
     @staticmethod
     def get_cars_by_criteria(make=None, model=None, min_price=None, max_price=None, type_of_car=None, type_of_fuel=None):
-        query = "SELECT * FROM car_management.public.car WHERE STATUS = 'Available'"
-        data = []
+            query = "SELECT * FROM car_management.public.car WHERE STATUS = 'available'"
+            data = []
 
-        if make:
-            query += " AND make = %s"
-            data.append(make)
-        if model:
-            query += " AND model = %s"
-            data.append(model)
-        if min_price:
-            query += " AND price >= %s"
-            data.append(min_price)
-        if max_price:
-            query += " AND price <= %s"
-            data.append(max_price)
-        if type_of_car:
-            query += " AND type_of_car = %s"
-            data.append(type_of_car)
-        if type_of_fuel:
-            query += " AND type_of_fuel = %s"
-            data.append(type_of_fuel)
+            if make:
+                query += " AND make = %s"
+                data.append(make)
+            if model:
+                query += " AND model = %s"
+                data.append(model)
+            if min_price:
+                query += " AND price >= %s"
+                data.append(min_price)
+            if max_price:
+                query += " AND price <= %s"
+                data.append(max_price)
+            if type_of_car:
+                query += " AND type_of_car = %s"
+                data.append(type_of_car)
+            if type_of_fuel:
+                query += " AND type_of_fuel = %s"
+                data.append(type_of_fuel)
 
-        # Log the query and data
-        current_app.logger.debug(f"Query: {query}")
-        current_app.logger.debug(f"Data: {data}")
+            # Log the query and data
+            current_app.logger.debug(f"Query: {query}")
+            current_app.logger.debug(f"Data: {data}")
 
-        return Car.execute_query(query, tuple(data), fetchall=True)
+            return Car.execute_query(query, tuple(data), fetchall=True)
     
     @staticmethod
     def get_by_id(car_id):
@@ -112,13 +113,14 @@ class Car:
         
 
 class Booking:
-
-    @staticmethod
-    def create_booking(user_name, phone_number, car_id, car_make, car_model, price, booking_date, address):
+    def create_booking(user_name, phone_number, car_id, car_make, car_model, price, address):
         # Validate input parameters
-        if not (user_name and phone_number and car_id and car_make and car_model and price and booking_date and address):
+        if not (user_name and phone_number and car_id and car_make and car_model and price and address):
             current_app.logger.error("Missing booking details")
             return None
+
+        # Generate booking date
+        booking_date = datetime.now()  # Correct usage
 
         insert_query = """
             INSERT INTO car_management.public.bookings 
@@ -134,18 +136,18 @@ class Booking:
 
             # Retrieve the booking_id based on the inserted data
             select_query = """
-                SELECT booking_id
+                SELECT id
                 FROM car_management.public.bookings
                 WHERE user_name = %s AND phone_number = %s AND car_id = %s AND car_make = %s 
                 AND car_model = %s AND price = %s AND booking_date = %s AND address = %s
-                ORDER BY booking_id DESC
+                ORDER BY id DESC
                 LIMIT 1
             """
-            result = Car.execute_query(select_query, data, fetchall=False)
+            result = Car.execute_query(select_query, data, fetchall=True)
             current_app.logger.info(f"Query executed, result: {result}")
 
             if result and len(result) > 0:
-                booking_id = result[0]
+                booking_id = result[0][0]
                 current_app.logger.info(f"Booking created successfully with ID: {booking_id}")
 
                 # Update car status to booked
@@ -164,7 +166,3 @@ class Booking:
         except Exception as e:
             current_app.logger.error(f"Database query failed: {e}")
             return None
-
-
-
-

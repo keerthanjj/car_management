@@ -2,30 +2,29 @@ from flask import Blueprint, current_app, request, jsonify
 from models import Booking, Car
 
 
-from datetime import datetime
-
-
 user_bp = Blueprint('user', __name__)
 
-@user_bp.route('/cars', methods=['POST'])
+@user_bp.route('/all_cars', methods=['GET'])
 def get_cars():
-    """
-    Endpoint to get cars based on user selection criteria.
-    """
-    criteria = request.json
+    make = request.args.get('make')
+    model = request.args.get('model')
+    min_price = request.args.get('min_price', type=float)
+    max_price = request.args.get('max_price', type=float)
+    type_of_car = request.args.get('type_of_car')
+    type_of_fuel = request.args.get('type_of_fuel')
 
-    # Extract criteria from JSON data
-    make = criteria.get('make')
-    model = criteria.get('model')
-    min_price = criteria.get('min_price')
-    max_price = criteria.get('max_price')
-    type_of_car = criteria.get('type_of_car')
-    type_of_fuel = criteria.get('type_of_fuel')
+    cars = Car.get_cars_by_criteria(
+        make=make,
+        model=model,
+        min_price=min_price,
+        max_price=max_price,
+        type_of_car=type_of_car,
+        type_of_fuel=type_of_fuel
+    )
 
-    # Call method to retrieve cars based on criteria
-    cars = Car.get_cars_by_criteria(make=make, model=model, min_price=min_price, max_price=max_price, type_of_car=type_of_car, type_of_fuel=type_of_fuel)
+    if not cars:
+        return jsonify({"message": "No cars found matching the criteria"}), 404
 
-    # Return list of cars as JSON response
     return jsonify({"cars": cars}), 200
 
 
@@ -36,7 +35,7 @@ def create_booking():
     """
     try:
         # Extract booking details from the request JSON
-        booking_details = request.json
+        booking_details = request.get_json()
         user_name = booking_details.get('user_name')
         phone_number = booking_details.get('phone_number')
         car_id = booking_details.get('car_id')
@@ -53,15 +52,12 @@ def create_booking():
         if car:
             car_make = car.get('make')
             car_model = car.get('model')
-            car_price=car.get('price')
+            car_price = car.get('price')
         else:
             return jsonify({"error": "Car details not found"}), 404
 
-        # Capture current date and time
-        booking_date = datetime.now()
-
         # Call create_booking method from Booking model
-        booking_id = Booking.create_booking(user_name, phone_number, car_id, car_make, car_model,car_price, booking_date, address)
+        booking_id = Booking.create_booking(user_name, phone_number, car_id, car_make, car_model, car_price, address)
         
         if booking_id:
             return jsonify({"message": "Booking created successfully", "booking_id": booking_id}), 201
@@ -71,5 +67,3 @@ def create_booking():
     except Exception as e:
         current_app.logger.error(f"An error occurred: {e}")
         return jsonify({"error": "An error occurred"}), 500
-
-
