@@ -1,8 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
-name: Build and deploy Python app to Azure Web App - karManagement
+name: Build, Test, and Deploy to Azure Web App - karManagement
 
 on:
   push:
@@ -30,15 +26,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
         
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
         with:
-          name: python-app
+          name: python-app-artifact
           path: |
             release.zip
             !venv/
@@ -49,19 +43,16 @@ jobs:
     environment:
       name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
-          name: python-app
+          name: python-app-artifact
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      
       - name: Login to Azure
         uses: azure/login@v1
         with:
@@ -75,3 +66,31 @@ jobs:
         with:
           app-name: 'karManagement'
           slot-name: 'production'
+
+  test:
+    runs-on: ubuntu-latest
+    needs: deploy
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Ensure compatibility with Newman
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Install Newman HTML reporter
+        run: npm install -g newman-reporter-html
+
+      - name: Run Postman tests
+        run: |
+          newman run "UCar_management.postman_collection.json" -e "Car_management.postman_collection.json" -r cli,html --reporter-html-export newman-report.html
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: newman-report
+          path: newman-report.html
