@@ -6,10 +6,16 @@
 			"value": "https://karmanagement.azurewebsites.net",
 			"type": "default",
 			"enabled": true
+		},
+		{
+			"key": "vin",
+			"value": "",
+			"type": "default",
+			"enabled": true
 		}
 	],
 	"name": "Globals",
 	"_postman_variable_scope": "globals",
-	"_postman_exported_at": "2024-06-07T11:10:03.187Z",
+	"_postman_exported_at": "2024-06-07T12:19:46.099Z",
 	"_postman_exported_using": "Postman/11.1.14"
 }

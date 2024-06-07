@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "12b3c2c4-7324-4654-a734-de94735628e9",
 		"name": "Car_management",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "33114980"
 	},
 	"item": [
@@ -28,12 +28,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{baseurl}}",
-							"host": [
-								"{{baseurl}}"
-							]
-						}
+						"url": "{{baseurl}}"
 					},
 					"response": []
 				}
@@ -95,16 +90,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{baseurl}}/admin/add_car",
-							"host": [
-								"{{baseurl}}"
-							],
-							"path": [
-								"admin",
-								"add_car"
-							]
-						}
+						"url": "{{baseurl}}/admin/add_car"
 					},
 					"response": []
 				},
@@ -215,8 +201,11 @@
 									"    pm.response.to.have.header(\"Content-Type\", \"application/json\");\r",
 									"});\r",
 									"\r",
-									"// Store VIN for further use\r",
-									"pm.environment.set(\"vin\", vin);"
+									"// Test Case 5: Store VIN for further use\r",
+									"pm.test(\"Update Car - Store VIN for further use\", function () {\r",
+									"    pm.environment.set(\"vin\", vin);\r",
+									"});\r",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -228,7 +217,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n        \"make\": \"Tata\",\r\n        \"model\": \"Vista\",\r\n        \"color\": \"Blue\",\r\n        \"price\": 400000,\r\n        \"mileage_in_km\": 22,\r\n        \"year\": 2016,\r\n        \"type_of_car\": \"Sedan\",\r\n        \"type_of_fuel\": \"Diesel\"\r\n}",
+							"raw": "{\r\n    \"make\": \"Tata\",\r\n    \"model\": \"Vista\",\r\n    \"color\": \"Blue\",\r\n    \"price\": 400000,\r\n    \"mileage_in_km\": 22,\r\n    \"year\": 2016,\r\n    \"type_of_car\": \"Sedan\",\r\n    \"type_of_fuel\": \"Diesel\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -255,27 +244,52 @@
 					"response": []
 				},
 				{
-					"name": "get_all_cars",
+					"name": "get_car",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
+									"var vin = pm.environment.get(\"vin\");\r",
+									"\r",
 									"// Test Case 1: Status Code is 200\r",
-									"pm.test(\"Status Code is 200\", function () {\r",
+									"pm.test(\"Get Car - Status Code is 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"// Test Case 2: Response has cars array\r",
-									"pm.test(\"Response has cars array\", function () {\r",
+									"// Test Case 2: Response Contains Car Details\r",
+									"pm.test(\"Get Car - Response Contains Car Details\", function () {\r",
 									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData).to.have.property(\"make\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonData).to.have.property(\"model\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonData).to.have.property(\"color\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonData).to.have.property(\"price\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonData).to.have.property(\"mileage_in_km\").that.is.a(\"number\");\r",
+									"    pm.expect(jsonData).to.have.property(\"year\").that.is.a(\"number\");\r",
+									"    pm.expect(jsonData).to.have.property(\"type_of_car\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonData).to.have.property(\"type_of_fuel\").that.is.a(\"string\");\r",
 									"});\r",
 									"\r",
-									"// Test Case 3: Cars array is not empty\r",
-									"pm.test(\"Cars array is not empty\", function () {\r",
+									"// Test Case 3: Response is JSON\r",
+									"pm.test(\"Get Car - Response is JSON\", function () {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"// Test Case 4: Content-Type Header is application/json\r",
+									"pm.test(\"Get Car - Content-Type Header is application/json\", function () {\r",
+									"    pm.response.to.have.header(\"Content-Type\", \"application/json\");\r",
+									"});\r",
+									"\r",
+									"// Test Case 5: Car Details Match the Updated Car\r",
+									"pm.test(\"Get Car - Car Details Match the Updated Car\", function () {\r",
 									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.length).to.be.above(0);\r",
+									"    pm.expect(jsonData.make).to.equal(\"Tata\");\r",
+									"    pm.expect(jsonData.model).to.equal(\"Vista\");\r",
+									"    pm.expect(jsonData.price).to.equal(\"400000.00\");\r",
+									"    pm.expect(jsonData.mileage_in_km).to.equal(22);\r",
+									"    pm.expect(jsonData.year).to.equal(2016);\r",
+									"    pm.expect(jsonData.type_of_car).to.equal(\"Sedan\");\r",
+									"    pm.expect(jsonData.type_of_fuel).to.equal(\"Diesel\");\r",
 									"});\r",
 									""
 								],
@@ -288,15 +302,55 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseurl}}/admin/all_cars",
+							"raw": "{{baseurl}}/admin/get_car?vin={{vin}}",
 							"host": [
 								"{{baseurl}}"
 							],
 							"path": [
 								"admin",
-								"all_cars"
+								"get_car"
+							],
+							"query": [
+								{
+									"key": "vin",
+									"value": "{{vin}}"
+								}
 							]
 						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_all_cars",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has cars array\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"cars\").that.is.an(\"array\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Cars array is not empty\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.cars.length).to.be.above(0);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseurl}}/admin/all_cars"
 					},
 					"response": []
 				},
@@ -307,21 +361,18 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Test Case 1: Status Code is 200\r",
-									"pm.test(\"Status Code is 200\", function () {\r",
+									"pm.test(\"Status code is 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"// Test Case 2: Response has bookings array\r",
 									"pm.test(\"Response has bookings array\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData).to.be.an(\"array\");\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"bookings\").that.is.an(\"array\");\r",
 									"});\r",
 									"\r",
-									"// Test Case 3: Bookings array is not empty\r",
 									"pm.test(\"Bookings array is not empty\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.length).to.be.above(0);\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.bookings.length).to.be.above(0);\r",
 									"});\r",
 									""
 								],
@@ -333,16 +384,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{baseurl}}/admin/current_bookings",
-							"host": [
-								"{{baseurl}}"
-							],
-							"path": [
-								"admin",
-								"current_bookings"
-							]
-						}
+						"url": "{{baseurl}}/admin/current_bookings"
 					},
 					"response": []
 				}
@@ -358,29 +400,25 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Test Case 1: Status Code is 200\r",
-									"pm.test(\"Status Code is 200\", function () {\r",
+									"pm.test(\"Status code is 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"// Test Case 2: Response has cars array\r",
 									"pm.test(\"Response has cars array\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData).to.be.an(\"array\");\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"cars\").that.is.an(\"array\");\r",
 									"});\r",
 									"\r",
-									"// Test Case 3: Cars array is not empty\r",
 									"pm.test(\"Cars array is not empty\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.length).to.be.above(0);\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.cars.length).to.be.above(0);\r",
 									"});\r",
 									"\r",
-									"// Test Case 4: Each car has mileage of at least 20 and fuel type Petrol\r",
-									"pm.test(\"Each car has mileage of at least 20 and fuel type Petrol\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    jsonData.forEach(function(car) {\r",
-									"        pm.expect(car.mileage_in_km).to.be.at.least(20);\r",
-									"        pm.expect(car.type_of_fuel).to.equal(\"Petrol\");\r",
+									"pm.test(\"Each car has a mileage of at least 20 and fuel type Petrol\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    jsonData.cars.forEach(car => {\r",
+									"        pm.expect(car[5]).to.be.at.least(20);\r",
+									"        pm.expect(car[8]).to.eql(\"Petrol\");\r",
 									"    });\r",
 									"});\r",
 									""
@@ -404,6 +442,11 @@
 							],
 							"query": [
 								{
+									"key": "make",
+									"value": "Tata",
+									"disabled": true
+								},
+								{
 									"key": "min_mileage",
 									"value": "20"
 								},
@@ -423,30 +466,21 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"var vin = pm.environment.get(\"vin\");\r",
-									"// Test Case 1: Status Code is 200\r",
-									"pm.test(\"Status Code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
 									"});\r",
 									"\r",
-									"// Test Case 2: Response has success message\r",
-									"pm.test(\"Response has success message\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.message).to.include(\"Booking successful\");\r",
+									"pm.test(\"Response contains success message and booking_id\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"message\", \"Booking created successfully\");\r",
+									"    pm.expect(jsonData).to.have.property(\"booking_id\");\r",
 									"});\r",
 									"\r",
-									"// Test Case 3: Response is JSON\r",
-									"pm.test(\"Response is JSON\", function () {\r",
-									"    pm.response.to.be.json;\r",
+									"pm.test(\"Booking ID is a number\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.booking_id).to.be.a(\"number\");\r",
 									"});\r",
-									"\r",
-									"// Test Case 4: Content-Type Header is application/json\r",
-									"pm.test(\"Content-Type Header is application/json\", function () {\r",
-									"    pm.response.to.have.header(\"Content-Type\", \"application/json\");\r",
-									"});\r",
-									"\r",
-									"// Store booking ID for further use\r",
-									"pm.environment.set(\"booking_id\", jsonData.booking_id);"
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -458,7 +492,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n        \"vin\": \"{{vin}}\",\r\n        \"booking_start_date\": \"2024-01-15\",\r\n        \"booking_end_date\": \"2024-01-17\",\r\n        \"user_email\": \"user@example.com\",\r\n        \"user_phone\": \"1234567890\"\r\n}",
+							"raw": "{\r\n    \"user_name\": \"Keerthan\",\r\n    \"phone_number\": \"8919444686\",\r\n     \"vin\":\"3323\", // Replace with the actual VIN of the car\r\n    \"address\": \"123 Main Street, City, Country\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -473,138 +507,12 @@
 							"path": [
 								"user",
 								"book_car"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get_booking",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var booking_id = pm.environment.get(\"booking_id\");\r",
-									"// Test Case 1: Status Code is 200\r",
-									"pm.test(\"Status Code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"// Test Case 2: Response Contains Booking Details\r",
-									"pm.test(\"Response Contains Booking Details\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData).to.have.property(\"booking_id\").that.is.a(\"string\");\r",
-									"    pm.expect(jsonData).to.have.property(\"vin\").that.is.a(\"string\");\r",
-									"    pm.expect(jsonData).to.have.property(\"booking_start_date\").that.is.a(\"string\");\r",
-									"    pm.expect(jsonData).to.have.property(\"booking_end_date\").that.is.a(\"string\");\r",
-									"    pm.expect(jsonData).to.have.property(\"user_email\").that.is.a(\"string\");\r",
-									"    pm.expect(jsonData).to.have.property(\"user_phone\").that.is.a(\"string\");\r",
-									"});\r",
-									"\r",
-									"// Test Case 3: Response is JSON\r",
-									"pm.test(\"Response is JSON\", function () {\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"// Test Case 4: Content-Type Header is application/json\r",
-									"pm.test(\"Content-Type Header is application/json\", function () {\r",
-									"    pm.response.to.have.header(\"Content-Type\", \"application/json\");\r",
-									"});\r",
-									"\r",
-									"// Test Case 5: Booking Details Match the Added Booking\r",
-									"pm.test(\"Booking Details Match the Added Booking\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.booking_id).to.equal(booking_id);\r",
-									"    pm.expect(jsonData.vin).to.equal(\"{{vin}}\");\r",
-									"    pm.expect(jsonData.booking_start_date).to.equal(\"2024-01-15\");\r",
-									"    pm.expect(jsonData.booking_end_date).to.equal(\"2024-01-17\");\r",
-									"    pm.expect(jsonData.user_email).to.equal(\"user@example.com\");\r",
-									"    pm.expect(jsonData.user_phone).to.equal(\"1234567890\");\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseurl}}/user/get_booking?booking_id={{booking_id}}",
-							"host": [
-								"{{baseurl}}"
-							],
-							"path": [
-								"user",
-								"get_booking"
 							],
 							"query": [
 								{
-									"key": "booking_id",
-									"value": "{{booking_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "cancel_booking",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var booking_id = pm.environment.get(\"booking_id\");\r",
-									"\r",
-									"// Test Case 1: Status Code is 200\r",
-									"pm.test(\"Cancel Booking - Status Code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"// Test Case 2: Response has success message\r",
-									"pm.test(\"Cancel Booking - Response has success message\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.message).to.include(\"Booking canceled successfully\");\r",
-									"});\r",
-									"\r",
-									"// Test Case 3: Response is JSON\r",
-									"pm.test(\"Cancel Booking - Response is JSON\", function () {\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"// Test Case 4: Content-Type is application/json\r",
-									"pm.test(\"Cancel Booking - Content-Type is application/json\", function () {\r",
-									"    pm.response.to.have.header(\"Content-Type\", \"application/json\");\r",
-									"});\r",
-									"\r",
-									"// Remove booking ID from environment\r",
-									"pm.environment.unset(\"booking_id\");"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseurl}}/user/cancel_booking?booking_id={{booking_id}}",
-							"host": [
-								"{{baseurl}}"
-							],
-							"path": [
-								"user",
-								"cancel_booking"
-							],
-							"query": [
-								{
-									"key": "booking_id",
-									"value": "{{booking_id}}"
+									"key": "vin",
+									"value": "{{vin}}",
+									"disabled": true
 								}
 							]
 						}
@@ -614,19 +522,68 @@
 			]
 		}
 	],
-	"event": [],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
-			"key": "baseurl",
-			"value": "localhost:3000"
+			"key": "base_Url",
+			"value": "http://127.0.0.1:5000",
+			"type": "string"
 		},
 		{
-			"key": "vin",
-			"value": ""
+			"key": "car_id",
+			"value": "",
+			"type": "string"
 		},
 		{
-			"key": "booking_id",
-			"value": ""
+			"key": "make",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "model",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "price",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "year",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "type_of_car",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "type_of_fuel",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
