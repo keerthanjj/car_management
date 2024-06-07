@@ -94,6 +94,7 @@ jobs:
         with:
           name: newman-report
           path: newman-report.html
+
       - name: Send email with test report
         uses: dawidd6/action-send-mail@v3
         with:
@@ -105,4 +106,3 @@ jobs:
           body: "Attached is the test report for karManagement."
           to: getkeerthan@gmail.com
           attachments: newman-report.html
-          
