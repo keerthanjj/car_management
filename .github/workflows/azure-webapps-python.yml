@@ -1,4 +1,4 @@
-name: Build, Test, and Deploy to Azure Web App - karManagement
+name: Build and deploy Python app to Azure Web App - karManagement
 
 on:
   push:
@@ -26,13 +26,15 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
         
+      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
         with:
-          name: python-app-artifact
+          name: python-app
           path: |
             release.zip
             !venv/
@@ -43,22 +45,25 @@ jobs:
     environment:
       name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
-          name: python-app-artifact
+          name: python-app
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
+      
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AB3601E29BE24A7F9272C1BB73A4DBE6 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6F013480578C47CE96143E61A6648D9F }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_FBCD912DAB734D9E95841FE672195E9F }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
@@ -87,7 +92,7 @@ jobs:
 
       - name: Run Postman tests
         run: |
-          newman run "postman\Car_management.postman_collection.json" -g "workspace.postman_globals.json" -r cli,html --reporter-html-export newman-report.html
+          newman run "postman/Car_management.postman_collection.json" -g "postman/workspace.postman_globals.json" -r cli,html --reporter-html-export newman-report.html
 
       - name: Upload test report
         uses: actions/upload-artifact@v3
