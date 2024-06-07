@@ -99,16 +99,6 @@ jobs:
         with:
           name: newman-report
           path: newman-report.html
-          #hi hello
+          
 
-      - name: Send email with test report
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.example.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "Test Report for karManagement"
-          body: "Attached is the test report for karManagement."
-          to: getkeerthan@gmail.com
-          attachments: newman-report.html
+      
