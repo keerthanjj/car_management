@@ -56,9 +56,14 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AB3601E29BE24A7F9272C1BB73A4DBE6 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6F013480578C47CE96143E61A6648D9F }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_FBCD912DAB734D9E95841FE672195E9F }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+          enable-AzPSSession: false
+          environment: azurecloud
+          allow-no-subscriptions: false
+          audience: api://AzureADTokenExchange
+          auth-type: 'spn'
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
@@ -87,7 +92,7 @@ jobs:
 
       - name: Run Postman tests
         run: |
-          newman run "Car_management.postman_collection.json" -r cli,html --reporter-html-export newman-report.html
+          newman run "postman/Car_management.postman_collection.json" -g "postman/workspace.postman_globals.json" -r cli,html --reporter-html-export newman-report.html
 
       - name: Upload test report
         uses: actions/upload-artifact@v3
