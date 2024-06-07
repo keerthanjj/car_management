@@ -7,10 +7,11 @@
 #     SNOWFLAKE_SCHEMA = 'PUBLIC'
 
 SNOWFLAKE = {
-    'account': 'bdhriyc-ke24872',
-    'user': 'Nithin',
-    'password': 'Nithin@2024',
-    'database': 'CAR_MANAGEMENT'
+    'account': 'JRXVIFO-IX80608',
+    'user': 'KEERTHANJJ',
+    'password': 'Mypwsnow123@',
+    'database': 'CAR_MANAGEMENT',
+    'schema':'PUBLIC'
 }
 
      
