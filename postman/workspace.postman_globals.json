@@ -3,7 +3,7 @@
 	"values": [
 		{
 			"key": "baseurl",
-			"value": "https://karmanagement.azurewebsites.net/",
+			"value": "https://karmanagement.azurewebsites.net",
 			"type": "default",
 			"enabled": true
 		}
