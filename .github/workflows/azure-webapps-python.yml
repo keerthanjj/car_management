@@ -105,3 +105,4 @@ jobs:
           body: "Attached is the test report for karManagement."
           to: getkeerthan@gmail.com
           attachments: newman-report.html
+          
