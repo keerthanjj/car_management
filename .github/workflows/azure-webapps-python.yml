@@ -87,7 +87,7 @@ jobs:
 
       - name: Run Postman tests
         run: |
-          newman run "Car_management.postman_collection.json" -g "workspace.postman_globals.json" -r cli,html --reporter-html-export newman-report.html
+          newman run "postman\Car_management.postman_collection.json" -g "postman\workspace.postman_globals.json" -r cli,html --reporter-html-export newman-report.html
 
       - name: Upload test report
         uses: actions/upload-artifact@v3
